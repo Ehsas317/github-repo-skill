@@ -92,5 +92,3 @@ This skill is built for "Vibe Coding." It includes specific logic to be token-ef
    The scripts use the Python Standard Library, so no extra `pip install` is required!
 
 ---
-
-*Built by Manus AI for Ehsas317.*
