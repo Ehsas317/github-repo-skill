@@ -1,54 +1,96 @@
 # GitHub Repo Skill: The Next Evolution of Repository Discovery
 
-This document outlines the significant advancements and new capabilities introduced in the `github-repo-skill`, building upon the foundational concept of a "GitHub repo finder." While the original aimed to simply locate repositories, this evolved skill provides intelligent discovery, comprehensive evaluation, and actionable integration recipes, specifically tailored for efficient AI agent workflows.
+This is the next-generation version of the **GitHub Repo Finder**. While the original tool focused on discovering useful repositories, this evolved skill is a **Repository Composition Engine**. It is designed to help you build complex projects faster by discovering, evaluating, and generating blueprints to combine existing open-source tools with minimal custom code.
 
-## From Simple Search to Intelligent Composition
+## 🚀 Quick Start Guide
 
-The initial "GitHub repo finder" likely focused on keyword-based searches to return a list of repositories. The `github-repo-skill` transforms this into a strategic tool for software composition, guided by the philosophy: **"Don't build from scratch — combine battle-tested repos with minimal glue code."**
+This skill consists of two primary scripts located in the `scripts/` directory.
 
-## Key Enhancements and New Features
+### 1. Find and Score Repositories
+Use `repo_finder.py` to discover the best tools for any task. It automatically expands your request into multiple search queries and scores results out of 100.
 
-### 1. Advanced Repository Scoring and Evaluation
+```bash
+# Basic search for a task
+python scripts/repo_finder.py --task "AI chatbot with Next.js" --max-results 5
 
-Beyond basic metrics like stars, the `github-repo-skill` introduces a sophisticated, multi-dimensional scoring system to assess repository quality and suitability. Each repository is evaluated on a 0-100 scale across five critical dimensions:
+# Search for a specific language with a quality threshold
+python scripts/repo_finder.py --task "PDF processing" --language python --min-stars 500
+```
 
-| Dimension     | Weight | What It Measures                                       |
-|---------------|--------|--------------------------------------------------------|
-| **Popularity**    | 25%    | Stars, forks (log-scaled, favors steady growth)        |
-| **Maintenance**   | 30%    | Recency of pushes, commit frequency                    |
-| **Community**     | 20%    | Contributors, issue velocity                           |
-| **Documentation** | 15%    | README quality, description, wiki, examples            |
-| **License**       | 10%    | Permissive license (MIT, Apache, BSD = full points)    |
+### 2. Compare Specific Repositories
+When you have a few candidates and need to make a data-driven choice, use the `compare` mode.
 
-This detailed breakdown provides a nuanced understanding of a repository's health and community support, enabling more informed decisions than simple star counts.
+```bash
+python scripts/repo_finder.py --mode compare --repos "owner/repo1,owner/repo2"
+```
 
-### 2. Intelligent Search Query Generation
+### 3. Generate a Combination Recipe
+The most powerful feature: generate a complete architectural plan to wire multiple repositories together.
 
-The `repo_finder.py` script now intelligently generates multiple, refined search queries from a high-level task description. It extracts relevant technology topics and capabilities (e.g., "websocket chat server," "authentication jwt oauth") to broaden and optimize GitHub API searches, ensuring a more comprehensive discovery of relevant projects.
+```bash
+# Find repos and pipe them directly into the recipe builder
+python scripts/repo_finder.py --task "video processing with OCR" --json | python scripts/recipe_builder.py --task "video processing with OCR"
+```
 
-### 3. Data-Driven Repository Comparison
+---
 
-Users can now directly compare specific repositories side-by-side using the `--mode compare` flag. This feature presents a clear, objective comparison based on the same five scoring dimensions, helping to choose the best tool for a particular job (e.g., comparing `PyMuPDF` vs. `pypdfium2` for PDF processing).
+## 🛠 Features & Evolution
 
-### 4. Automated Combination Recipe Generation
+This version introduces several major advancements over the original repo finder:
 
-This is the most significant advancement. The `recipe_builder.py` script takes the ranked repositories and generates an actionable architectural blueprint for integrating them. This recipe includes:
+### 📊 Advanced Scoring Engine
+We no longer just look at stars. Every repo is evaluated across five dimensions:
+*   **Popularity (25%)**: Stars and forks (log-scaled).
+*   **Maintenance (30%)**: Recency of updates and commit frequency.
+*   **Community (20%)**: Number of contributors and issue velocity.
+*   **Documentation (15%)**: Quality of README and presence of examples.
+*   **License (10%)**: Preference for permissive licenses (MIT, Apache, BSD).
 
-*   **Selected Repositories** with assigned roles (frontend, backend, AI, etc.)
-*   **Architecture Pattern** detection (e.g., Microservices, API Composition)
-*   **Integration Steps** (an 8-step process from setup to shipping)
-*   **Glue Code Estimate** (typically 300-750 lines, replacing thousands of lines of custom code)
-*   **Recommended File Structure**
-*   **Dependency Strategy**
-*   **Deployment Options**
-*   **Risk Mitigation** strategies
+### 🏗 Automated Recipe Builder
+The `recipe_builder.py` script creates a "Combination Recipe" which includes:
+*   **Architecture Patterns**: Automatically detects if you need Microservices, API Composition, or Library integration.
+*   **Glue Code Estimates**: Tells you exactly how much code you'll need to write (typically 300-750 lines).
+*   **Integration Steps**: A step-by-step 8-stage guide from setup to deployment.
+*   **File Structure**: A recommended directory layout for your new project.
 
-This feature directly addresses the challenge of combining disparate open-source tools into a cohesive solution, providing a clear roadmap for implementation.
+### 🤖 AI-Agent Optimization
+This skill is built for "Vibe Coding." It includes specific logic to be token-efficient for AI agents:
+*   It encourages importing interfaces rather than copying full source code.
+*   It provides self-documenting Docker Compose configurations.
+*   It focuses on "Adapter" patterns to keep the context window clean.
 
-### 5. AI Agent Token Efficiency Notes
+---
 
-Recognizing the constraints of AI agents, the skill includes specific guidance on maximizing token efficiency. This involves strategies like importing from repositories rather than copying source code, focusing on adapter interfaces, and leveraging Docker Compose for self-documenting infrastructure, thereby minimizing the context window required for building projects.
+## 📋 Comparison: Original vs. Next Version
 
-## Conclusion
+| Feature | Original "Github Repo Finder" | New "Github-Repo-Skill" |
+| :--- | :--- | :--- |
+| **Primary Goal** | Finding a single useful repo. | **Building a full system** by combining repos. |
+| **Search Intelligence** | Keyword-based. | **Task-to-Capability mapping.** |
+| **Scoring** | Star count. | **Multi-dimensional health scoring.** |
+| **Output** | List of links. | **Architectural blueprints (Recipes).** |
+| **Comparison** | Manual. | **Automated side-by-side analysis.** |
+| **Bug Status** | Unknown. | **Fully Debugged & API Verified.** |
 
-The `github-repo-skill` represents a paradigm shift from merely finding code to intelligently composing solutions. By integrating advanced scoring, smart search, comparative analysis, and automated recipe generation, it empowers developers and AI agents to build robust applications faster and more efficiently by leveraging the vast ecosystem of battle-tested open-source projects. It's not just a repo finder; it's a **repo composer**sitory **compo**sition **engine**.
+---
+
+## 🔧 Installation & Setup
+
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/Ehsas317/github-repo-skill-debug-guide.git
+   cd github-repo-skill-debug-guide
+   ```
+
+2. **(Optional) Set GitHub Token:**
+   To avoid rate limits, set your GitHub Personal Access Token:
+   ```bash
+   export GITHUB_TOKEN=your_token_here
+   ```
+
+3. **Run:**
+   The scripts use the Python Standard Library, so no extra `pip install` is required!
+
+---
+
+*Built by Manus AI for Ehsas317.*
