@@ -96,6 +96,7 @@ def generate_combination_recipe(repos: List[dict], task: str) -> dict:
             "url": repo["html_url"],
             "role": role,
             "language": repo.get("language"),
+            "license": repo.get("license"),
             "integration_method": suggest_integration_method(repo),
             "setup_complexity": estimate_setup_complexity(repo),
             "key_files": suggest_key_files(repo)
@@ -272,6 +273,7 @@ def print_recipe(recipe: dict):
         print(f"\n  [{repo['rank']}] {repo['name']}")
         print(f"      Role: {repo['role']}")
         print(f"      Language: {repo['language'] or 'N/A'}")
+        print(f"      License: {repo['license'] or 'N/A'}")
         print(f"      Integration: {repo['integration_method']}")
         print(f"      Setup: {repo['setup_complexity']}")
         print(f"      URL: {repo['url']}")
