@@ -78,7 +78,7 @@ This skill is built for "Vibe Coding." It includes specific logic to be token-ef
 
 1. **Clone the repo:**
    ```bash
-   git clone https://github.com/Ehsas317/github-repo-skill-debug-guide.git
+   git clone https://github.com/Ehsas317/github-repo-skill.git
    cd github-repo-skill-debug-guide
    ```
 
