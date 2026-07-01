@@ -32,6 +32,14 @@ The most powerful feature: generate a complete architectural plan to wire multip
 python scripts/repo_finder.py --task "video processing with OCR" --json | python scripts/recipe_builder.py --task "video processing with OCR"
 ```
 
+### 4. ⚡ Vibe Mode (AI-Agent Optimized)
+For ultra-fast "Vibe Coding," use the `--vibe` flag. This generates code-first, copy-paste ready blueprints specifically optimized for AI agents.
+
+```bash
+# Generate a copy-paste ready vibe recipe
+python scripts/repo_finder.py --task "real-time analytics" --json | python scripts/recipe_builder.py --task "real-time analytics" --vibe
+```
+
 ---
 
 ## 🛠 Features & Evolution
@@ -53,11 +61,12 @@ The `recipe_builder.py` script creates a "Combination Recipe" which includes:
 *   **Integration Steps**: A step-by-step 8-stage guide from setup to deployment.
 *   **File Structure**: A recommended directory layout for your new project.
 
-### 🤖 AI-Agent Optimization
-This skill is built for "Vibe Coding." It includes specific logic to be token-efficient for AI agents:
-*   It encourages importing interfaces rather than copying full source code.
-*   It provides self-documenting Docker Compose configurations.
-*   It focuses on "Adapter" patterns to keep the context window clean.
+### ⚡ Vibe Mode: Code-First Composition
+The new **Vibe Mode** (`--vibe`) is the ultimate toolkit for AI agents:
+*   **One-Line Vibe Checks**: Instant emoji-based readiness assessment (e.g., ✅ Drop-in, 🐳 Docker-ready).
+*   **Copy-Paste Infrastructure**: Generates a full `docker-compose.yml` for all services.
+*   **Main Orchestration Skeleton**: Creates a `main.py` with pre-configured adapters and TODO markers.
+*   **Environment Templates**: Auto-generates a `.env` file with all required API key placeholders.
 
 ---
 
@@ -69,6 +78,7 @@ This skill is built for "Vibe Coding." It includes specific logic to be token-ef
 | **Search Intelligence** | Keyword-based. | **Task-to-Capability mapping.** |
 | **Scoring** | Star count. | **Multi-dimensional health scoring.** |
 | **Output** | List of links. | **Architectural blueprints (Recipes).** |
+| **Vibe Coding** | No. | **Yes (`--vibe` flag).** |
 | **Comparison** | Manual. | **Automated side-by-side analysis.** |
 | **Bug Status** | Unknown. | **Fully Debugged & API Verified.** |
 
@@ -79,7 +89,7 @@ This skill is built for "Vibe Coding." It includes specific logic to be token-ef
 1. **Clone the repo:**
    ```bash
    git clone https://github.com/Ehsas317/github-repo-skill.git
-   cd github-repo-skill-debug-guide
+   cd github-repo-skill
    ```
 
 2. **(Optional) Set GitHub Token:**
