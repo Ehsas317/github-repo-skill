@@ -8,13 +8,189 @@ Usage:
     python repo_finder.py --task "chat app" --json | python recipe_builder.py --task "chat app"
     python recipe_builder.py --repos-file repos.json --task "e-commerce platform"
     python recipe_builder.py --repos "socketio/socket.io,auth0/node-jsonwebtoken,stripe/stripe-node"
+    python recipe_builder.py --task "task" --vibe  # Vibe coding mode
 """
 
 import argparse
 import json
 import sys
-from typing import List, Dict
+import os
+from typing import List, Dict, Any
 
+# ─── VIBE MODE: AI-AGENT-OPTIMIZED OUTPUT ─────────────────────────────────────
+
+VIBE_CHECK_EMOJI = {
+    "drop-in": "✅",
+    "needs-key": "🔑",
+    "needs-config": "⚙️",
+    "docker-ready": "🐳",
+    "manual-setup": "📦",
+}
+
+
+def vibe_check(repo: Dict[str, Any]) -> str:
+    """One-line vibe check for AI agents."""
+    desc = (repo.get("description") or "").lower()
+    name = repo.get("full_name", "")
+    
+    if "docker" in desc or "container" in desc:
+        return f"{VIBE_CHECK_EMOJI['docker-ready']} Docker-ready. Copy-paste compose."
+    if any(k in desc for k in ["api key", "apikey", "token", "auth"]):
+        return f"{VIBE_CHECK_EMOJI['needs-key']} Needs API key. 5-min setup."
+    if "sdk" in desc or "client" in desc:
+        return f"{VIBE_CHECK_EMOJI['drop-in']} Drop-in SDK. Import and go."
+    if "framework" in desc or "framework" in name.lower():
+        return f"{VIBE_CHECK_EMOJI['needs-config']} Framework. Needs config hook."
+    return f"{VIBE_CHECK_EMOJI['drop-in']} Drop-in. No config needed."
+
+
+def generate_docker_compose(repos: List[Dict[str, Any]], task: str) -> str:
+    """Generate a copy-paste ready docker-compose.yml."""
+    services = {}
+    for i, repo in enumerate(repos):
+        name = repo.get("full_name", "").split("/")[-1].lower().replace("-", "_")
+        port = 8000 + i
+        services[name] = {
+            "image": f"{repo.get('full_name', 'service').lower()}:latest",
+            "container_name": f"{name}_{i}",
+            "ports": [f"{port}:{port}"],
+            "restart": "unless-stopped",
+            "environment": [f"PORT={port}"],
+        }
+    
+    # Add an orchestrator service
+    services["app"] = {
+        "build": ".",
+        "container_name": "app",
+        "depends_on": list(services.keys()),
+        "env_file": [".env"],
+        "volumes": [".:/app"],
+    }
+    
+    compose = {
+        "version": "3.8",
+        "services": services
+    }
+    return json.dumps(compose, indent=2)
+
+
+def generate_vibe_main(repos: List[Dict[str, Any]], task: str) -> str:
+    """Generate a main.py skeleton with explicit TODO markers."""
+    imports = []
+    adapters = []
+    setup_lines = []
+    
+    for i, repo in enumerate(repos):
+        name = repo.get("full_name", "").split("/")[-1].lower().replace("-", "_")
+        class_name = "".join([x.capitalize() for x in name.split("_")])
+        
+        imports.append(f"from adapters.{name} import {class_name}Adapter")
+        adapters.append(f"{name}_svc = {class_name}Adapter()")
+        setup_lines.append(f"    # TODO: Configure {name} ({repo.get('html_url')})")
+        
+    code = f'''# main.py — Auto-generated for: {task}
+# DO NOT EDIT REPO INTERNALS. Use adapters only.
+
+{chr(10).join(imports)}
+
+{chr(10).join(adapters)}
+
+def run():
+{chr(10).join(setup_lines)}
+    # TODO: Add your business logic here
+    pass
+
+if __name__ == "__main__":
+    run()'''
+    return code
+
+
+def generate_env_template(repos: List[Dict[str, Any]]) -> str:
+    """Generate .env with TODO markers for every likely API key."""
+    lines = ["# .env — Auto-generated. Fill in before running."]
+    seen = set()
+    
+    for repo in repos:
+        name = repo.get("full_name", "").split("/")[-1].upper().replace("-", "_")
+        if name not in seen:
+            seen.add(name)
+            lines.append(f"{name}_API_KEY=TODO_FILL_ME_IN")
+    
+    lines.append("GITHUB_TOKEN=TODO_OPTIONAL_FOR_RATE_LIMITS")
+    return "\n".join(lines)
+
+
+def generate_vibe_recipe(repos: List[Dict[str, Any]], task: str) -> Dict[str, Any]:
+    """Generate a token-minimal, code-first recipe for AI vibe coding."""
+    if not repos:
+        return {"task": task, "status": "NO_REPOS", "code": {}}
+    
+    repos.sort(key=lambda x: x.get("score", x.get("stars", 0)), reverse=True)
+    selected = []
+    for i, repo in enumerate(repos):
+        selected.append({
+            "rank": i + 1,
+            "name": repo["full_name"],
+            "url": repo["html_url"],
+            "vibe": vibe_check(repo),
+            "role": f"Component {i+1} for {task}",
+            "language": repo.get("language"),
+            "score": repo.get("score", 0),
+        })
+        
+    return {
+        "task": task,
+        "status": "READY",
+        "philosophy": "Compose, don't build. Adapters only. No repo internals.",
+        "selected": selected,
+        "code": {
+            "docker-compose.yml": generate_docker_compose(repos, task),
+            "main.py": generate_vibe_main(repos, task),
+            ".env": generate_env_template(repos),
+        },
+        "next_steps": [
+            "1. Copy code blocks into your project.",
+            "2. Fill TODOs in .env.",
+            "3. Run `docker-compose up`.",
+            "4. Write adapters in src/adapters/.",
+        ],
+        "token_note": "Load only adapter interfaces, not full repo source.",
+    }
+
+
+def print_vibe_recipe(recipe: Dict[str, Any]):
+    """Ultra-minimal output. No prose. Just code blocks and JSON."""
+    if recipe.get("status") == "NO_REPOS":
+        print('{"error": "No repos found"}')
+        return
+
+    # Machine-readable header
+    print(f"# TASK: {recipe['task']}")
+    print(f"# PHILOSOPHY: {recipe['philosophy']}")
+    print()
+
+    # Selected repos — one line each
+    for r in recipe["selected"]:
+        print(f"# [{r['rank']}] {r['name']} — {r['vibe']} — {r['url']}")
+    print()
+
+    print("# ─── CODE BLOCKS — COPY PASTE ───")
+    print()
+    for filename, content in recipe["code"].items():
+        print(f"### {filename}")
+        print("```")
+        print(content)
+        print("```")
+        print()
+
+    print("# ─── NEXT STEPS ───")
+    for step in recipe["next_steps"]:
+        print(f"# {step}")
+    print()
+    print(f"# {recipe['token_note']}")
+
+
+# ─── EXISTING RECIPE BUILDER CODE ───────────────────────────────────────────
 
 def detect_architecture_pattern(repos: List[dict]) -> str:
     """Determine the best architecture pattern based on repo characteristics."""
@@ -155,7 +331,7 @@ def generate_combination_recipe(repos: List[dict], task: str) -> dict:
         "Have swap candidates (identify backup repos for each component)"
     ]
 
-    # AI agent notes - the key value prop
+    # AI agent notes
     recipe["ai_agent_notes"] = [
         "TOKEN EFFICIENCY: Import from repos rather than rewriting. Each line of glue code replaces 50-200 lines of implementation.",
         "CONTEXT WINDOW: Load only the adapter interfaces, not full repo source. Use package types/declarations.",
@@ -338,6 +514,7 @@ def main():
     parser.add_argument("--repos-file", type=str, help="JSON file from repo_finder.py")
     parser.add_argument("--repos", type=str, help="Comma-separated list of owner/repo pairs")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--vibe", action="store_true", help="Vibe coding mode: code-first, minimal prose, copy-paste ready")
 
     args = parser.parse_args()
 
@@ -347,7 +524,6 @@ def main():
         with open(args.repos_file) as f:
             repos = json.load(f)
     elif args.repos:
-        # Build minimal repo dicts from names
         for spec in args.repos.split(","):
             spec = spec.strip()
             if "/" in spec:
@@ -360,7 +536,6 @@ def main():
                     "topics": []
                 })
     else:
-        # Read from stdin
         try:
             stdin_data = sys.stdin.read()
             if stdin_data.strip():
@@ -373,12 +548,18 @@ def main():
               file=sys.stderr)
         sys.exit(1)
 
-    recipe = generate_combination_recipe(repos, args.task)
-
-    if args.json:
-        print(json.dumps(recipe, indent=2))
+    if args.vibe:
+        recipe = generate_vibe_recipe(repos, args.task)
+        if args.json:
+            print(json.dumps(recipe, indent=2))
+        else:
+            print_vibe_recipe(recipe)
     else:
-        print_recipe(recipe)
+        recipe = generate_combination_recipe(repos, args.task)
+        if args.json:
+            print(json.dumps(recipe, indent=2))
+        else:
+            print_recipe(recipe)
 
 
 if __name__ == "__main__":
